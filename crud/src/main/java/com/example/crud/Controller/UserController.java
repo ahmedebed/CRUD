@@ -2,16 +2,18 @@ package com.example.crud.Controller;
 
 import com.example.crud.DTO.UserDTO;
 import com.example.crud.Service.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 @RequestMapping("/api/admin")
 @RestController
 @RequiredArgsConstructor
+@Validated
 public class UserController {
     private final UserService userService;
 
@@ -36,7 +38,7 @@ public class UserController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<?> addUser(@RequestBody UserDTO userDTO   ) {
+    public ResponseEntity<?> addUser(@Valid @RequestBody UserDTO userDTO) {
         try {
             return ResponseEntity.ok(userService.addUser(userDTO)); // Pass token to service
         } catch (Exception e) {
@@ -45,7 +47,7 @@ public class UserController {
     }
 
     @PutMapping("/update")
-    public ResponseEntity<?> updateUser(@RequestBody UserDTO userDTO) {
+    public ResponseEntity<?> updateUser(@Valid @RequestBody UserDTO userDTO) {
         try {
             return ResponseEntity.ok(userService.updateUser(userDTO));
         } catch (Exception e) {

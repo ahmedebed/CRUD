@@ -1,6 +1,6 @@
 package com.example.crud.Service;
 
-import com.example.crud.DTO.ResourceNotFoundException;
+import com.example.crud.Exception.ResourceNotFoundException;
 import com.example.crud.Entity.Role;
 import com.example.crud.Entity.User;
 
