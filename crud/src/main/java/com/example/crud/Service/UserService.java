@@ -21,11 +21,6 @@ public class UserService {
     private final JwtService jwtService; // Inject JwtService to verify token
 
     public List<UserDTO> getAll() {
-        // Verify the token
-//        String username = jwtService.extractUsername();
-//        if (username == null || !jwtService.validateToken()) {
-//            throw new RuntimeException("Invalid Token");
-//        }
 
         List<User> users = userRepo.findAll();
         return users.stream()
@@ -49,7 +44,7 @@ public class UserService {
         User user = new User();
         user.setEmail(userDTO.getEmail());
         user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
-        user.setRole(Role.USER); // Default role is USER
+        user.setRole(Role.USER);
         userRepo.save(user);
 
         userDTO.setId(user.getId());
@@ -62,7 +57,7 @@ public class UserService {
         if (existingUser.isPresent()) {
             User updatedUser = existingUser.get();
             updatedUser.setEmail(userDTO.getEmail());
-            updatedUser.setPassword(passwordEncoder.encode(userDTO.getPassword())); // Update password as well
+            updatedUser.setPassword(passwordEncoder.encode(userDTO.getPassword()));
             userRepo.save(updatedUser);
             return ResponseEntity.ok("User updated");
         } else {
