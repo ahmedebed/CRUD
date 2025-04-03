@@ -20,12 +20,12 @@ public class UserService {
     private final UserRepo userRepo;
     private final JwtService jwtService; // Inject JwtService to verify token
 
-    public List<UserDTO> getAll(String token) {
+    public List<UserDTO> getAll() {
         // Verify the token
-        String username = jwtService.extractUsername(token);
-        if (username == null || !jwtService.validateToken(token)) {
-            throw new RuntimeException("Invalid Token");
-        }
+//        String username = jwtService.extractUsername();
+//        if (username == null || !jwtService.validateToken()) {
+//            throw new RuntimeException("Invalid Token");
+//        }
 
         List<User> users = userRepo.findAll();
         return users.stream()
@@ -33,12 +33,7 @@ public class UserService {
                 .toList();
     }
 
-    public void deleteUser(Long id, String token) {
-        // Verify the token
-        String username = jwtService.extractUsername(token);
-        if (username == null || !jwtService.validateToken(token)) {
-            throw new RuntimeException("Invalid Token");
-        }
+    public void deleteUser(Long id) {
 
         Optional<User> user = userRepo.findById(id);
         if (user.isPresent()) {
@@ -48,12 +43,8 @@ public class UserService {
         }
     }
 
-    public ResponseEntity<UserDTO> addUser(UserDTO userDTO, String token) {
+    public ResponseEntity<UserDTO> addUser(UserDTO userDTO) {
         // Verify the token
-        String username = jwtService.extractUsername(token);
-        if (username == null || !jwtService.validateToken(token)) {
-            throw new RuntimeException("Invalid Token");
-        }
 
         User user = new User();
         user.setEmail(userDTO.getEmail());
@@ -65,13 +56,7 @@ public class UserService {
         return ResponseEntity.ok(userDTO);
     }
 
-    public ResponseEntity<String> updateUser(UserDTO userDTO, String token) {
-        // Verify the token
-        String username = jwtService.extractUsername(token);
-        if (username == null || !jwtService.validateToken(token)) {
-            throw new RuntimeException("Invalid Token");
-        }
-
+    public ResponseEntity<String> updateUser(UserDTO userDTO) {
         Optional<User> existingUser = userRepo.findById(userDTO.getId());
 
         if (existingUser.isPresent()) {

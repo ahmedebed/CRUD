@@ -10,17 +10,17 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@RequestMapping("/api/users")
+@RequestMapping("/api/admin")
 @RestController
 @RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
 
     @GetMapping("/getAll")
-    @PreAuthorize("hasRole('ADMIN')") // Only admin can access
-    public ResponseEntity<?> getAllUser(@RequestHeader("Authorization") String token) {
+   // @PreAuthorize("hasRole('ADMIN')") // Only admin can access
+    public ResponseEntity<?> getAllUser() {
         try {
-            List<UserDTO> users = userService.getAll(token); // Pass token to service
+            List<UserDTO> users = userService.getAll(); // Pass token to service
             return ResponseEntity.ok(users);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error fetching users");
@@ -28,10 +28,10 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')") // Only admin can delete users
-    public ResponseEntity<?> deleteUser(@PathVariable("id") Long id, @RequestHeader("Authorization") String token) {
+   // @PreAuthorize("hasRole('ADMIN')") // Only admin can delete users
+    public ResponseEntity<?> deleteUser(@PathVariable("id") Long id) {
         try {
-            userService.deleteUser(id, token); // Pass token to service
+            userService.deleteUser(id); // Pass token to service
             return ResponseEntity.ok("User Deleted");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
@@ -40,19 +40,19 @@ public class UserController {
 
     @PostMapping("/add")
     @PreAuthorize("hasRole('ADMIN')") // Only admin can add users
-    public ResponseEntity<?> addUser(@RequestBody UserDTO userDTO, @RequestHeader("Authorization") String token) {
+    public ResponseEntity<?> addUser(@RequestBody UserDTO userDTO) {
         try {
-            return ResponseEntity.ok(userService.addUser(userDTO, token)); // Pass token to service
+            return ResponseEntity.ok(userService.addUser(userDTO)); // Pass token to service
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error adding user");
         }
     }
 
     @PutMapping("/update")
-    @PreAuthorize("hasRole('ADMIN')") // Only admin can update users
-    public ResponseEntity<?> updateUser(@RequestBody UserDTO userDTO, @RequestHeader("Authorization") String token) {
+    //@PreAuthorize("hasRole('ADMIN')") // Only admin can update users
+    public ResponseEntity<?> updateUser(@RequestBody UserDTO userDTO) {
         try {
-            return ResponseEntity.ok(userService.updateUser(userDTO, token)); // Pass token to service
+            return ResponseEntity.ok(userService.updateUser(userDTO)); // Pass token to service
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error updating user");
         }
