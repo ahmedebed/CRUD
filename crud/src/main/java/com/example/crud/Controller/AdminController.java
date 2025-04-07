@@ -2,7 +2,7 @@ package com.example.crud.Controller;
 
 import com.example.crud.DTO.UserDTO;
 import com.example.crud.DTO.UserRequest;
-import com.example.crud.Service.UserService;
+import com.example.crud.Service.AdminService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -15,13 +15,13 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @Validated
-public class UserController {
-    private final UserService userService;
+public class AdminController {
+    private final AdminService adminService;
 
     @GetMapping
     public ResponseEntity<?> getAllUser() {
         try {
-            List<UserDTO> users = userService.getAll();
+            List<UserDTO> users = adminService.getAll();
             return ResponseEntity.ok(users);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error fetching users");
@@ -31,7 +31,7 @@ public class UserController {
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteUser(@PathVariable("id") Long id) {
         try {
-            userService.deleteUser(id);
+            adminService.deleteUser(id);
             return ResponseEntity.ok("User Deleted");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
@@ -41,7 +41,7 @@ public class UserController {
     @PostMapping
     public ResponseEntity<?> addUser(@Valid @RequestBody UserRequest userRequest) {
         try {
-            return ResponseEntity.ok(userService.addUser(userRequest));
+            return ResponseEntity.ok(adminService.addUser(userRequest));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error adding user");
         }
@@ -53,7 +53,7 @@ public class UserController {
             @Valid @RequestBody UserRequest userRequest
     ) {
         try {
-            return userService.updateUser(id, userRequest);
+            return adminService.updateUser(id, userRequest);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error updating user");
         }

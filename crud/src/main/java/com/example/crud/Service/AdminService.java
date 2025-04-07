@@ -1,5 +1,7 @@
 package com.example.crud.Service;
 
+import com.example.crud.DTO.CarDTO;
+import com.example.crud.DTO.CourseDTO;
 import com.example.crud.DTO.UserDTO;
 import com.example.crud.DTO.UserRequest;
 import com.example.crud.Entity.Role;
@@ -18,17 +20,35 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 @Validated
-public class UserService {
+public class AdminService {
     private final PasswordEncoder passwordEncoder;
     private final UserRepo userRepo;
 
     // Get all users
     public List<UserDTO> getAll() {
-        List<User> users = userRepo.findAll();
+        List<User> users = userRepo.findByRole(Role.USER);
         return users.stream()
-                .map(user -> new UserDTO(user.getId(), user.getEmail(), user.getPassword(), user.getRole()))
+                .map(user -> UserDTO.builder()
+                        .id(user.getId())
+                        .email(user.getEmail())
+                        .password(user.getPassword())
+                        .role(user.getRole())
+                        .courses(user.getCourses().stream()
+                                .map(course -> CourseDTO.builder()
+                                        .id(course.getId())
+                                        .name(course.getName())
+                                        .build())
+                                .toList())
+                        .cars(user.getCars().stream()
+                                .map(car -> CarDTO.builder()
+                                        .id(car.getId())
+                                        .name(car.getName())
+                                        .build())
+                                .toList())
+                        .build())
                 .toList();
     }
+
 
     // Delete user by ID
     public void deleteUser(Long id) {
