@@ -1,6 +1,7 @@
 package com.example.crud.Service;
 
 import com.example.crud.DTO.UserDTO;
+import com.example.crud.DTO.UserRequest;
 import com.example.crud.Entity.Role;
 import com.example.crud.Entity.User;
 import com.example.crud.Repo.UserRepo;
@@ -16,11 +17,10 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-@Validated // Enable validation for service methods
+@Validated
 public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final UserRepo userRepo;
-    private final JwtService jwtService; // Inject JwtService to verify token
 
     // Get all users
     public List<UserDTO> getAll() {
@@ -41,37 +41,49 @@ public class UserService {
     }
 
     // Add a new user
-    public ResponseEntity<UserDTO> addUser(UserDTO userDTO) {
-        // Check if the user already exists
-        Optional<User> existingUser = userRepo.findByEmail(userDTO.getEmail());
-        if (existingUser.isPresent()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
-        }
+    public ResponseEntity<UserDTO> addUser(UserRequest userRequest) {
+        Optional<User> existingUser = userRepo.findByEmail(userRequest.getEmail());
 
-        // Create and save the new user
-        User user = new User();
-        user.setEmail(userDTO.getEmail());
-        user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
-        user.setRole(Role.USER); // Default role for the new user
+        UserDTO userDTO = UserDTO.builder()
+                .email(userRequest.getEmail())
+                .password(passwordEncoder.encode(userRequest.getPassword()))
+                .role(Role.USER)
+                .build();
+        User user = User.builder()
+                .email(userDTO.getEmail())
+                .password(userDTO.getPassword())
+                .role(userDTO.getRole())
+                .build();
+
         userRepo.save(user);
 
-        userDTO.setId(user.getId()); // Set the ID to the UserDTO
+        userDTO.setId(user.getId());
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(userDTO); // Respond with 201 status on successful creation
+        return ResponseEntity.status(HttpStatus.CREATED).body(userDTO);
     }
 
     // Update an existing user
-    public ResponseEntity<String> updateUser(@Valid UserDTO userDTO) {
-        Optional<User> existingUser = userRepo.findById(userDTO.getId());
+    public ResponseEntity<String> updateUser(Long id, @Valid UserRequest userRequest) {
+        Optional<User> existingUserOpt = userRepo.findById(id);
 
-        if (existingUser.isPresent()) {
-            User updatedUser = existingUser.get();
-            updatedUser.setEmail(userDTO.getEmail());
-            updatedUser.setPassword(passwordEncoder.encode(userDTO.getPassword()));
-            userRepo.save(updatedUser);
-            return ResponseEntity.ok("User updated");
-        } else {
+        if (existingUserOpt.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
         }
+        User existingUser = existingUserOpt.get();
+        if (existingUser.getRole() == Role.ADMIN) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Cannot update an admin user");
+        }
+
+        User updatedUser = User.builder()
+                .id(id)
+                .email(userRequest.getEmail())
+                .password(passwordEncoder.encode(userRequest.getPassword()))
+                .role(existingUser.getRole())
+                .build();
+
+        userRepo.save(updatedUser);
+        return ResponseEntity.ok("User updated successfully");
     }
+
+
 }

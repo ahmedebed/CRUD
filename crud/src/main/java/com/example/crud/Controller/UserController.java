@@ -1,6 +1,7 @@
 package com.example.crud.Controller;
 
 import com.example.crud.DTO.UserDTO;
+import com.example.crud.DTO.UserRequest;
 import com.example.crud.Service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -10,14 +11,14 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
-@RequestMapping("/api/admin")
+@RequestMapping("/admin-api/users")
 @RestController
 @RequiredArgsConstructor
 @Validated
 public class UserController {
     private final UserService userService;
 
-    @GetMapping("/users")
+    @GetMapping
     public ResponseEntity<?> getAllUser() {
         try {
             List<UserDTO> users = userService.getAll();
@@ -37,21 +38,25 @@ public class UserController {
         }
     }
 
-    @PostMapping("/add")
-    public ResponseEntity<?> addUser(@Valid @RequestBody UserDTO userDTO) {
+    @PostMapping
+    public ResponseEntity<?> addUser(@Valid @RequestBody UserRequest userRequest) {
         try {
-            return ResponseEntity.ok(userService.addUser(userDTO)); // Pass token to service
+            return ResponseEntity.ok(userService.addUser(userRequest));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error adding user");
         }
     }
 
-    @PutMapping("/update")
-    public ResponseEntity<?> updateUser(@Valid @RequestBody UserDTO userDTO) {
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateUser(
+            @PathVariable Long id,
+            @Valid @RequestBody UserRequest userRequest
+    ) {
         try {
-            return ResponseEntity.ok(userService.updateUser(userDTO));
+            return userService.updateUser(id, userRequest);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error updating user");
         }
     }
+
 }

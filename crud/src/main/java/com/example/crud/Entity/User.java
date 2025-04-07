@@ -2,6 +2,7 @@ package com.example.crud.Entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
@@ -15,13 +16,14 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
+@Builder
 @Table(name = "user")
 public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String email;
-    private String Password;
+    private String password;
     private Role role;
 
     @Override
@@ -31,7 +33,7 @@ public class User implements UserDetails {
 
     @Override
     public String getPassword() {
-        return Password;
+        return password;
     }
 
     @Override

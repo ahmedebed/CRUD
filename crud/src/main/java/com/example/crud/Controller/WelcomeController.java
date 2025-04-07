@@ -10,9 +10,9 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class WelcomeController {
     private final WelcomeService welcomeService;
-    @GetMapping("/home/{id}")
-    public String WelcomeMassage(@PathVariable Long id){
+    @GetMapping("/home")
+    public String WelcomeMassage(){
 
-        return welcomeService.getWelcomeMessageForUser(id);
+        return welcomeService.getWelcomeMessageForUser();
     }
 }
