@@ -1,15 +1,15 @@
 package com.example.crud.DTO;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import jakarta.validation.constraints.NotBlank;
+import lombok.*;
 
-@Data
+@Setter
+@Getter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 public class CourseDTO {
     private Long id;
+    @NotBlank(message = "Course name must not be blank")
     private String name;
 }

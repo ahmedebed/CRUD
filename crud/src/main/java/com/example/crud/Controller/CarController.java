@@ -12,10 +12,7 @@ import java.util.List;
 @RequestMapping("/user-api/car")
 @RequiredArgsConstructor
 public class CarController {
-
     private final CarService carService;
-
-    // Add car to user
     @PostMapping("/{userId}")
     private ResponseEntity<String> addCar(@PathVariable Long userId, @RequestBody CarDTO carDTO) {
         carService.addCarToUser(userId, carDTO);
@@ -26,8 +23,6 @@ public class CarController {
         List<CarDTO> carDTOs = carService.getAllCarsForUser();
         return ResponseEntity.ok(carDTOs);
     }
-
-    // Get car by ID
     @GetMapping("/{carId}")
     public ResponseEntity<CarDTO> getCar(@PathVariable Long carId) {
         CarDTO carDTO = carService.getCarById(carId);

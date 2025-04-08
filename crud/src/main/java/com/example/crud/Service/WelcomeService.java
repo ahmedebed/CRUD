@@ -19,10 +19,8 @@ public class WelcomeService {
     public String getWelcomeMessageForUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String email = authentication.getName();
-
         User user = userRepo.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + email));
-
         if (user.getRole() == Role.ADMIN) {
             return "Welcome Admin " + user.getEmail();
         } else {

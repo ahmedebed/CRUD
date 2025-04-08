@@ -16,9 +16,6 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
 
     public User register(UserRequest userRequest) {
-        if (userRepo.findByEmail(userRequest.getEmail()).isPresent()) {
-            throw new IllegalStateException("Email already taken");
-        }
         User newUser = new User();
         newUser.setEmail(userRequest.getEmail());
         newUser.setPassword(passwordEncoder.encode(userRequest.getPassword()));

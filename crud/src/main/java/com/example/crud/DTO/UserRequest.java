@@ -16,7 +16,7 @@ public class UserRequest {
 
     @Email(message = "Invalid email format")
     @NotBlank(message = "Email is required")
-    @UniqueEmail(message = "Email is already taken")
+    @UniqueEmail(message = "Email is already taken please Enter anther Email")
     private String email;
 
     @NotBlank(message = "Password is required")

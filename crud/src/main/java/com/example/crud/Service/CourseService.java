@@ -21,10 +21,8 @@ public class CourseService {
         Course course = new Course();
         course.setName(courseDTO.getName());
         courseRepo.save(course);
-
         return ResponseEntity.ok("Course added successfully");
     }
-
     public String EnrolledCourse(Long courseId) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String loggedInUserEmail = authentication.getName();
@@ -34,7 +32,6 @@ public class CourseService {
                 .orElseThrow(() -> new RuntimeException("Course not found with id: " + courseId));
         user.getCourses().add(course);
         userRepo.save(user);
-
         return "User " + loggedInUserEmail + " enrolled in course " + courseId;
     }
 }

@@ -6,6 +6,7 @@ import com.example.crud.DTO.UserDTO;
 import com.example.crud.DTO.UserRequest;
 import com.example.crud.Entity.Role;
 import com.example.crud.Entity.User;
+import com.example.crud.Mpper.UserMapper;
 import com.example.crud.Repo.UserRepo;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -22,34 +23,14 @@ import java.util.Optional;
 @Validated
 public class AdminService {
     private final PasswordEncoder passwordEncoder;
+    private final UserMapper userMapper;
     private final UserRepo userRepo;
 
     // Get all users
     public List<UserDTO> getAll() {
         List<User> users = userRepo.findByRole(Role.USER);
-        return users.stream()
-                .map(user -> UserDTO.builder()
-                        .id(user.getId())
-                        .email(user.getEmail())
-                        .password(user.getPassword())
-                        .role(user.getRole())
-                        .courses(user.getCourses().stream()
-                                .map(course -> CourseDTO.builder()
-                                        .id(course.getId())
-                                        .name(course.getName())
-                                        .build())
-                                .toList())
-                        .cars(user.getCars().stream()
-                                .map(car -> CarDTO.builder()
-                                        .id(car.getId())
-                                        .name(car.getName())
-                                        .build())
-                                .toList())
-                        .build())
-                .toList();
+        return users.stream().map(userMapper::userToUserDTO).toList();
     }
-
-
     // Delete user by ID
     public void deleteUser(Long id) {
         Optional<User> user = userRepo.findById(id);
@@ -59,29 +40,15 @@ public class AdminService {
             throw new RuntimeException("User not found with ID: " + id);
         }
     }
-
     // Add a new user
     public ResponseEntity<UserDTO> addUser(UserRequest userRequest) {
-        Optional<User> existingUser = userRepo.findByEmail(userRequest.getEmail());
-
-        UserDTO userDTO = UserDTO.builder()
-                .email(userRequest.getEmail())
-                .password(passwordEncoder.encode(userRequest.getPassword()))
-                .role(Role.USER)
-                .build();
-        User user = User.builder()
-                .email(userDTO.getEmail())
-                .password(userDTO.getPassword())
-                .role(userDTO.getRole())
-                .build();
-
+        User user = userMapper.userRequestToUser(userRequest);
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user.setRole(Role.USER);
         userRepo.save(user);
-
-        userDTO.setId(user.getId());
-
+        UserDTO userDTO = userMapper.userToUserDTO(user);
         return ResponseEntity.status(HttpStatus.CREATED).body(userDTO);
     }
-
     // Update an existing user
     public ResponseEntity<String> updateUser(Long id, @Valid UserRequest userRequest) {
         Optional<User> existingUserOpt = userRepo.findById(id);
@@ -93,14 +60,12 @@ public class AdminService {
         if (existingUser.getRole() == Role.ADMIN) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Cannot update an admin user");
         }
-
-        User updatedUser = User.builder()
-                .id(id)
-                .email(userRequest.getEmail())
-                .password(passwordEncoder.encode(userRequest.getPassword()))
-                .role(existingUser.getRole())
-                .build();
-
+        User updatedUser = userMapper.userRequestToUser(userRequest);
+        updatedUser.setId(id);
+        updatedUser.setPassword(passwordEncoder.encode(updatedUser.getPassword()));
+        updatedUser.setRole(Role.USER);
+        updatedUser.setCars(existingUser.getCars());
+        updatedUser.setCourses(existingUser.getCourses());
         userRepo.save(updatedUser);
         return ResponseEntity.ok("User updated successfully");
     }
