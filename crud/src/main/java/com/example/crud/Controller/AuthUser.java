@@ -30,13 +30,9 @@ public class AuthUser {
     }
     @PostMapping("/login")
     public ResponseEntity<String> login(@Valid @RequestBody LoginRequest loginRequest) {
-        try {
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword())
             );
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid email or password");
-        }
         UserDetails userDetails = authService.getUserByEmail(loginRequest.getEmail());
         String token = jwtService.generateToken(userDetails);
         return ResponseEntity.ok(token);

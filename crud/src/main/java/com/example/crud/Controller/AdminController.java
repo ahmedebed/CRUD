@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 
 @RequestMapping("/admin-api/users")
@@ -22,51 +23,31 @@ public class AdminController {
     private final CourseService courseService;
 
     @GetMapping
-    public ResponseEntity<?> getAllUser() {
-        try {
-            List<UserDTO> users = adminService.getAll();
-            return ResponseEntity.ok(users);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error fetching users");
-        }
+    public ResponseEntity<List<UserDTO>> getAllUser() {
+        List<UserDTO> users = adminService.getAll();
+        return ResponseEntity.ok(users);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteUser(@PathVariable("id") Long id) {
-        try {
-            adminService.deleteUser(id);
-            return ResponseEntity.ok("User Deleted");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
-        }
+    public ResponseEntity<String> deleteUser(@PathVariable("id") Long id) {
+        adminService.deleteUser(id);
+        return ResponseEntity.ok("User Deleted");
     }
-
     @PostMapping
-    public ResponseEntity<?> addUser(@Valid @RequestBody UserRequest userRequest) {
-        try {
-            return ResponseEntity.ok(adminService.addUser(userRequest));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error adding user");
-        }
+    public ResponseEntity<UserDTO> addUser(@Valid @RequestBody UserRequest userRequest) {
+        UserDTO userDTO = adminService.addUser(userRequest).getBody();
+        return ResponseEntity.status(HttpStatus.CREATED).body(userDTO);
     }
-
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateUser(
+    public ResponseEntity<String> updateUser(
             @PathVariable Long id,
             @Valid @RequestBody UserRequest userRequest
     ) {
-        try {
-            return adminService.updateUser(id, userRequest);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error updating user");
-        }
+        return adminService.updateUser(id, userRequest);
     }
     @PostMapping("/addCourse")
-    public ResponseEntity<String> addCourse(@RequestBody CourseDTO courseDTO){
+    public ResponseEntity<String> addCourse(@RequestBody CourseDTO courseDTO) {
         courseService.addCourse(courseDTO);
-        return ResponseEntity.ok("Courses added success");
+        return ResponseEntity.ok("Course added successfully");
     }
-
-
-
 }

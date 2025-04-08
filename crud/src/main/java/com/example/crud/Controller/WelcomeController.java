@@ -12,7 +12,6 @@ public class WelcomeController {
     private final WelcomeService welcomeService;
     @GetMapping("/home")
     public String WelcomeMassage(){
-
         return welcomeService.getWelcomeMessageForUser();
     }
 }
