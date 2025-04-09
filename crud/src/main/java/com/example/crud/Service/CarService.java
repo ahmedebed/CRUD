@@ -1,5 +1,4 @@
 package com.example.crud.Service;
-
 import com.example.crud.Entity.Car;
 import com.example.crud.Entity.User;
 import com.example.crud.Exception.ResourceNotFoundException;
@@ -11,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -25,24 +23,17 @@ public class CarService {
 
     // Add car to user
     public CarDTO addCarToUser(Long userId, CarDTO carDTO) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String loggedInUserEmail = authentication.getName();
         User user = userRepo.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
-        if (!user.getEmail().equals(loggedInUserEmail)) {
-            throw new RuntimeException("You can't add a car to another user's account.");
-        }
         Car car = carMapper.carDTOToCar(carDTO);
         car.setUser(user);
         car = carRepo.save(car);
         return carMapper.carToCarDTO(car);
     }
 
-    public List<CarDTO> getAllCarsForUser() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String loggedInUserEmail = authentication.getName();
-        User user = userRepo.findByEmail(loggedInUserEmail)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + loggedInUserEmail));
+    public List<CarDTO> getAllCarsForUser(Long userId) {
+        User user = userRepo.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
         List<Car> cars = carRepo.findByUser(user);
         return cars.stream()
                 .map(carMapper::carToCarDTO)

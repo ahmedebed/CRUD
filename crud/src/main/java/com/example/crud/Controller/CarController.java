@@ -2,6 +2,8 @@ package com.example.crud.Controller;
 
 import com.example.crud.DTO.CarDTO;
 import com.example.crud.Service.CarService;
+import com.example.crud.Service.GlobalService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,14 +15,17 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CarController {
     private final CarService carService;
-    @PostMapping("/{userId}")
-    private ResponseEntity<String> addCar(@PathVariable Long userId, @RequestBody CarDTO carDTO) {
+    private final GlobalService globalService;
+    @PostMapping
+    private ResponseEntity<String> addCar(HttpServletRequest http, @RequestBody CarDTO carDTO) {
+        Long userId= globalService.extractUserIdFromToken(http);
         carService.addCarToUser(userId, carDTO);
         return ResponseEntity.ok("Car added");
     }
     @GetMapping
-    public ResponseEntity<List<CarDTO>> getAllCarsForUser() {
-        List<CarDTO> carDTOs = carService.getAllCarsForUser();
+    public ResponseEntity<List<CarDTO>> getAllCarsForUser(HttpServletRequest http) {
+        Long userId =globalService.extractUserIdFromToken(http);
+        List<CarDTO> carDTOs = carService.getAllCarsForUser(userId);
         return ResponseEntity.ok(carDTOs);
     }
     @GetMapping("/{carId}")
